@@ -1,0 +1,185 @@
+EVC004 - Mostrar tarjetas de principales y adicionales en APP
+Se deben visualizar las pantallas de acuerdo con los diseños UX/UI
+Mostrar desde el consolidado de productos solo las tarjetas principales (CARDHOLDER FLAG = 0) asociadas al cliente en la relación cliente producto
+Al consultar el detalle de la tarjeta principal, habilitar una opción para visualizar las tarjetas adicionales de la TDC principal
+Las tarjetas adicionales deben buscarse por número de cuenta y se deben mostrar los plásticos que:
+Sean diferente de las asociadas al tarjetahabiente principal (CARDHOLDER FLAG = 0), con ningún tipo de bloqueo de tarjeta
+Asociados al CARDHOLDER FLAG = 2
+No mantengan los bloqueos:
+D = Cancelada
+F = Fraude
+L = Pérdida y Robo
+Las tarjetas adicionales no deben mostrarse en el consolidado de producto
+El usuario debe poder visualizar las tarjetas adicionales en una pantalla. Estas tarjetas deben mostrar el nombre del cliente, marca y modelo del plástico, 4 últimos dígitos de la tarjeta
+Al seleccionar la tarjeta adicional, se debe mostrar los datos de la tarjeta
+
+
+
+EVC004 - Envío de notificaciones por activación de TDC
+Cuando se complete de manera exitosa el proceso de activación de TDC, se deberá enviar un correo de notificación al usuario que realizó la activación y a los demás principales monetarios (si hubiera) que existan en el GE
+La notificación será la siguiente, completando los campos de la siguiente manera:
+$Nombre: colocar primer nombre de usuario que realiza la activación
+Se debe incluir la fecha de la activación realizada
+Se debe mantener el formato de la plantilla para notificaciones del canal y enviar a la dirección de correo que mantiene el usuario registrado en el canal
+Se debe mantener el mismo subject y correo desde donde se envían las notificaciones del canal digital
+Se espera que esta plantilla se actualice para la activación de TDC.
+Hola $Nombre,
+
+
+Queremos informarle que se ha realizado con éxito la activación de su tarjeta de crédito. Fecha que realizó el proceso: dd-mm-aaaa.
+Si no ha gestionado este proceso, repórtelo a nuestra Sucursal Telefónica al (507) 321-0101.
+ 
+Recuerde que Banistmo nunca le solicitará confirmar o actualizar información confidencial relacionada con sus cuentas, claves de acceso, PIN, números de tarjetas de crédito, débito, ni Soft Token. De recibir una llamada, correo electrónico o mensaje de texto solicitando esta información repórtelo a nuestra Sucursal Telefónica.
+
+
+EVC004 - Registrar en la bitácora de eventos activación TDC
+Se debe enviar a la bitácora de eventos, en la sección de Administrativas, en el Tipo de evento: Activación TDC:
+Nombre: Nombre del usuario que efectuó la activación
+Apellido: Apellido del usuario que efectuó la activación
+Tipo de evento: Activación TDC
+Descripción: <Resultado de la ejecución de activación en Fiserv (Exitoso o Fallido)>
+Monto: No aplica
+Fecha y hora de ejecución: fecha y hora de la activación exitosa
+
+EVC004 - Envío a Binacle de la información de activación de TDC
+Se requiere que cada vez que en app empresas se active exitosamente una TDC, se almacene en la tabla Binacle el evento con la información del proceso. En el campo se debe hacer diferencia que el canal que lo envía es App light. En la descripción de la transacción se debe indicar “Activación de TDC APP”. El resto de los campos se deben guardar con la información del canal.
+Se requiere que cada vez que en app empresas se envíe un correo notificando activación exitosa de TDC, se almacene en la tabla Binacle el evento con la información del proceso. En el campo se debe hacer diferencia que el canal que lo envía es App light. En la descripción de la transacción se debe indicar “Correo por activación de TDC APP”. El resto de los campos se deben guardar con la información del canal.
+Asegurar que estos envíos a Binacle también sean enviados a la LZ.
+
+EVC004 - Enviar eventos de activación de TDC a BAN08
+Todas las activaciones y correos de activación que se realicen de las TDC principales y adicionales deben viajar a la tabla el BAN08 para que sean reportadas posteriormente a los átomos de la SBP, en el código que nos indique el regulador
+El código que nos asignará el regulador será implementado con esta HU. Mientras se genere, utilicemos uno genérico 888888 para las pruebas
+
+
+EVC004 - Traducción al inglés activación TDC
+Se requiere que los nuevos mensajes y labels se presenten en inglés de acuerdo a la preferencia del usuario
+
+EVC004 - Administrar botón de activar tarjetas en MAC
+Se requiere contar con una opción que permita administrar el botón de Activar tarjeta desde el MAC
+El objetivo es que se pueda encender o apagar a demanda del negocio esté botón, en donde:
+En caso de estar encendido se debe mostrar el botón Activar en pantalla. 
+De lo contrario, si está apagado, este botón no debe mostrarse en pantalla para activar tarjetas principales o adicionales.
+Aplica para el botón de Activar para tarjetas principales y adicionales
+
+EVC004 - LOGS activar TDC
+En logs se espera que se guarde la trazabilidad completa de la gestión realizada en el proceso de activación de tarjetas. Esta información se debe poder consultar a requerimiento, y se debe almacenar el detalle que se guarda hoy en día.
+No guardar en logs la información confidencial de la TDC (número de TDC, CVV y Fecha de exp)
+
+EVC004 - Generar reporte de activaciones de tarjetas
+Al cierre de cada día a las 11:59pm (revisar con equipo TDC) debe generarse un archivo con las activaciones exitosas gestionadas en el canal y entregarse este reporte antes de las 8 am del día siguiente.
+
+
+El archivo se debe generar en formato CSV
+El archivo debe tener los siguientes campos:
+Número CIS / Organización
+Logo
+Número de Tarjeta, 4 últimos dígitos de la tarjeta principal o adicional que se activó
+Tarjetahabiente: Colocar Principal si se recibe P o Adicional si se recibe S.
+Fecha en la que realizó la activación.
+El documento debe tener le nombre Activacion_TDC_APP_YYYYMMDD (fecha del día que se va a generar la información)
+Este archivo debe dejarse en la ruta: \\nTAPPAMA01-C01\CREDIT_CARDS-OVERDRAFT\ACTIVACION TDC CANALES
+
+
+EVC004 - Flujo de activación TDC - Adicional
+Generales:
+Se deben visualizar las pantallas de acuerdo con los diseños UX/UI
+Esta funcionalidad de activar tarjeta debe funcionar en horario SAF
+Este flujo solo está habilitado para el usuario principal monetario en la que el GE tiene solo 1 tarjeta asociada y según la activación del botón en el MAC
+Se debe deshabilitar el botón de retornar nativo de la pantalla una vez comenzado el flujo de activación
+Esta pantalla no debe permitir capturas, fotos o videos
+En los escenarios donde se cierre la sesión por la funcionalidad de multisesión, se debe mostrar el mensaje de cierre de sesión que se muestra hoy en día por multisesión, si no se ha dado clic al botón activar debe cerrar la sesión, sino activar la tarjeta con todo el comportamiento y luego cerrar la sesión
+ 
+Flujo de usuario:
+En Productos / Tarjetas de crédito / Detalle de tarjeta  
+En la pantalla de Detalle de tarjeta se debe habilitar una opción para visualizar las tarjetas adicionales de la TDC principal
+El usuario debe poder seleccionar qué tarjeta adicional va a activar y entrar a la pantalla de Detalle de tarjeta adicional 
+Se debe validar que:
+La tarjeta no está activa, es decir, el FLAG ACTIVATION está en Y
+El campo USER2 es diferente a En blanco, Destruida o los códigos BV996(dd-mm-YYYYY), BV996R(dd-mm-YYYYY) o BV996D(dd-mm-YYYYY)
+En el caso de que la tarjeta cumpla con lo anterior, habilitar el botón de Activar
+Al dar clic al botón de Activar se debe validar si el usuario ha tratado de activar la TDC en las últimas 24 horas:
+En el caso de que haya realizado 3 intentos fallidos, se le muestra el modal de "Intentos de activación agotados" con el mensaje: "Solo se permiten 3 intentos de activación por día. Si necesita activar su tarjeta, por favor comuníquese al (507) 321 0101 o contacte a su Ejecutivo de relación"
+En el caso de que no haya realizado intentos, sigue el flujo esperado
+Se le muestra al usuario una pantalla solicitándole los datos para la activación de la tarjeta:
+Título: Activación de tarjeta
+Descripción: Realice la activación una vez reciba su tarjeta
+Datos que se solicitan:
+Últimos 4 dígitos de su tarjeta
+Incluir máscara
+Validar que sea obligatorio
+Validar que tenga 4 dígitos
+Fecha de expiración
+Validar que sea obligatorio
+Validar que sea formato fecha MM/AA
+Ingrese el CVV
+Incluir máscara
+Validar que sea obligatorio
+Validar que tenga 3 dígitos
+No habilitar el botón de Activar hasta que se completen los datos correctamente
+Incluir botón de navegación Atrás, el cliente podrá regresar a pantalla anterior.
+Una vez el botón de Activar esté habilitado y el usuario le da clic, se debe desplegar el modal del token para solicitarlo y validar el segundo factor de autenticación (Soft Token), ya sea de manera automática si se encuentra en el dispositivo donde tiene instalado el token o mediante el modal de ingresar el token (si no se encuentra en el dispositivo donde mantiene el token instalado)
+Se debe considerar que, de ingresar 3 veces mal el número de token, debe aparecer el modal de token bloqueado y deshabilitar todos los procesos que requieran token de acuerdo con el tiempo parametrizado en Detect ID.
+De validarse correctamente el token pero los datos de la TDC son inválidos, se le muestra la pantalla nuevamente de los datos con los campos marcados como inválidos y el mensaje "Los datos ingresados son inválidos. Por favor verifique e intente nuevamente."
+De validarse correctamente el token pero los datos de la TDC son inválidos y además el usuario ha realizado 3 intentos fallidos de activación, se le muestra el modal de "Intentos de activación agotados" con el mensaje: "Solo se permiten 3 intentos de activación por día. Si necesita activar su tarjeta, por favor comuníquese al (507) 321 0101 o contacte a su Ejecutivo de relación"
+De validarse correctamente el token y los datos de la TDC son correctos, se debe redirigir al cliente a la pantalla de Detalle de tarjeta adicional y se debe mostrar el mensaje "Su tarjeta ha sido activada con éxito" 
+En el caso de que el servicio de activación de Fiserv tome más de lo esperado por el canal, se le mostrará al cliente la pantalla de Activación pendiente, indicándole que podría revisar el estatus en la bitácora de eventos del canal
+Al momento de la activación, se debe pasar el FLAG ACTIVATION de Y a N
+En el escenario de ser una tarjeta nueva, es decir, que mantiene el CARD ACTION 1 (LCA 1), se debe también levantar el bloqueo de la tarjeta colocando espacio en blanco, pasando el CARD BLOCK CODE de A a espacio en blanco
+En los escenarios de Renovación (LCA 7 o 9) y Reposiciones o Sustituciones (LCA 3, 5 o 9), solo se debe pasar el FLAG ACTIVATION de Y a N, más no debe quitarse ningún Card block code porque no deben tenerlo
+Al activar una tarjeta de crédito solo se puede pasar del codeblock A o en blanco a Blanco, no se permite pasar a otro código
+Se permite activar tarjeta en estado B, sin embargo, el código de bloqueo no se levanta, se debe mantener la B.
+Mientras la tarjeta no esté activa, se debe mostrar deshabilitada la opción de "Ver datos de mi tarjeta"
+Si se presenta problemas con los servicios de activación de la TDC, se debe mostrar una alerta de error con el siguiente mensaje: “Se ha presentado un problema con la acción requerida, por favor intente más tarde. Si el problema persiste, contacte a su Ejecutivo de relación.”
+
+
+EVC004 - Flujo de activación TDC - Principal
+Generales:
+Se deben visualizar las pantallas de acuerdo con los diseños UX/UI
+Esta funcionalidad de activar tarjeta debe funcionar en horario SAF
+Este flujo solo está habilitado para el usuario principal monetario único en la que el GE tiene solo 1 tarjeta asociada y según la activación del botón en el MAC
+Se debe deshabilitar el botón de retornar nativo del dispositivo una vez comenzado el flujo de activación
+Esta pantalla no debe permitir capturas, fotos o videos
+En los escenarios donde se cierre la sesión por la funcionalidad de multisesión, se debe mostrar el mensaje de cierre de sesión que se muestra hoy en día por multisesión, si no se ha dado clic al botón activar debe cerrar la sesión, sino activar la tarjeta con todo el comportamiento y luego cerrar la sesión
+Agregar criterio para agregar pantalla de falla por si no existe tdc ppal (incidente mencionado por Omar sobre el producto)
+ 
+Flujo de usuario:
+En Productos / Tarjetas de crédito / Detalle de tarjeta 
+En la pantalla de Detalle de tarjeta se debe validar que:
+La tarjeta no está activa, es decir, el FLAG ACTIVATION está en Y
+El campo USER2 es diferente a En blanco, Destruida o los códigos BV996(dd-mm-YYYYY), BV996R(dd-mm-YYYYY) o BV996D(dd-mm-YYYYY)
+En el caso de que esto se cumpla se debe habilitar un botón de Activar
+Al dar clic al botón de Activar se debe validar si el usuario ha tratado de activar la TDC en las últimas 24 horas:
+En el caso de que haya realizado 3 intentos fallidos, se le muestra el modal de "Intentos de activación agotados" con el mensaje: "Solo se permiten 3 intentos de activación por día. Si necesita activar su tarjeta, por favor comuníquese al (507) 321 0101 o contacte a su Ejecutivo de relación"
+En el caso de que no haya realizado intentos, sigue el flujo esperado
+Se le muestra al usuario una pantalla solicitándole los datos para la activación de la tarjeta:
+Título: Activación de tarjeta
+Descripción: Realice la activación una vez reciba su tarjeta
+Datos que se solicitan:
+Últimos 4 dígitos de su tarjeta
+Incluir máscara
+Validar que sea obligatorio
+Validar que tenga 4 dígitos
+Fecha de expiración
+Validar que sea obligatorio
+Validar que sea formato fecha MM/AA
+Debe completarse 2digitos/2digitos, de manera automática, es decir el "/" es fijo en pantalla
+Ingrese el CVV
+Incluir máscara
+Validar que sea obligatorio
+Validar que tenga 3 dígitos
+No habilitar el botón de Activar hasta que se completen los datos correctamente
+Incluir botón de navegación Atrás, el cliente podrá regresar a pantalla anterior.
+Una vez el botón de Activar esté habilitado y el usuario le da clic, se debe desplegar el modal del token para solicitarlo y validar el segundo factor de autenticación (Soft Token), ya sea de manera automática si se encuentra en el dispositivo donde tiene instalado el token o mediante el modal de ingresar el token (si no se encuentra en el dispositivo donde mantiene el token instalado)
+Se debe considerar que, de ingresar 3 veces mal el número de token, debe aparecer el modal de token bloqueado y deshabilitar todos los procesos que requieran token de acuerdo con el tiempo parametrizado en Detect ID.
+De validarse correctamente el token pero los datos de la TDC son inválidos, se le muestra la pantalla nuevamente de los datos con los campos marcados como inválidos y el mensaje "Sus datos ingresados son incorrectos. Por favor verifique e intente nuevamente."
+De validarse correctamente el token pero los datos de la TDC son inválidos y además el usuario ha realizado 3 intentos fallidos de activación, se le muestra el modal de "Intentos de activación agotados" con el mensaje: "Solo se permiten 3 intentos de activación por día. Si necesita activar su tarjeta, por favor comuníquese al (507) 321 0101 o contacte a su Ejecutivo de relación"
+De validarse correctamente el token y los datos de la TDC son correctos, se debe redirigir al cliente a la pantalla de Detalle de tarjeta y se debe mostrar el mensaje "Su tarjeta ha sido activada con éxito"
+En el caso de que el servicio de activación de Fiserv tome más de lo esperado por el canal, se le mostrará al cliente la pantalla de Activación pendiente, indicándole que podría revisar el estatus en la bitácora de eventos del canal. Determinar el tiempo de espera
+Al momento de la activación, se debe pasar el FLAG ACTIVATION de Y a N
+En el escenario de ser una tarjeta nueva, es decir, que mantiene el CARD ACTION 1 (LCA 1), se debe también levantar el bloqueo de la tarjeta colocando espacio en blanco, pasando el CARD BLOCK CODE de A a espacio en blanco
+En los escenarios de Renovación (LCA 7 o 9) y Reposiciones o Sustituciones (LCA 3, 5 o 9), solo se debe pasar el FLAG ACTIVATION de Y a N, más no debe quitarse ningún Card block code porque no deben tenerlo
+Al activar una tarjeta de crédito solo se puede pasar del codeblock A o en blanco a Blanco, no se permite pasar a otro código
+Se permite activar tarjeta en estado B, sin embargo, el código de bloqueo no se levanta, se debe mantener la B.
+Mientras la tarjeta no esté activa, se debe mostrar deshabilitada la opción de "Ver datos de mi tarjeta"
+Cuando la tarjeta no está activa, el botón Pagar, se debe mostrar como Activar y esta activación solo aplica para la tarjeta principal
+Si se presenta problemas con los servicios de activación de la TDC, se debe mostrar una alerta de error con el siguiente mensaje: “Se ha presentado un problema con la acción requerida, por favor intente más tarde. Si el problema persiste, contacte a su Ejecutivo de relación.” confirmar si es con numero tambien
